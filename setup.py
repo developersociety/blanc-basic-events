@@ -7,7 +7,7 @@ except ImportError:
 
 setup(
     name='blanc-basic-events',
-    version='0.1',
+    version='0.2',
     description='Blanc Basic Events for Django',
     long_description=open('README.rst').read(),
     url='http://www.blanctools.com/',
@@ -20,6 +20,7 @@ setup(
     packages=[
         'blanc_basic_events',
         'blanc_basic_events.events',
+        'blanc_basic_events.events.templatetags',
     ],
     classifiers=[
         'Environment :: Web Environment',

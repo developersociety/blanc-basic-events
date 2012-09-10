@@ -20,6 +20,7 @@ FREQUENCY_CHOICES = (
     (12, 'Monthly - Second'),
     (13, 'Monthly - Third'),
     (14, 'Monthly - Fourth'),
+    (15, 'Monthly - Fifth'),
     (19, 'Monthly - Last'),
 )
 
@@ -86,6 +87,8 @@ class RegularEvent(models.Model):
                 offset = 3
             elif self.meeting_frequency == '14':
                 offset = 4
+            elif self.meeting_frequency == '15':
+                offset = 5
             elif self.meeting_frequency == '19':
                 offset = -1
 

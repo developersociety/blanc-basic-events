@@ -39,13 +39,14 @@ class RegularEvent(models.Model):
     description = models.TextField(help_text='All of the event details we have.')
 
     start = models.DateTimeField(
-            help_text='First date this will appear in the calendar.')
+            help_text='Start time/date.')
     end = models.DateTimeField(
-            help_text='Last date this will appear in the calendar.')
+            help_text='End time/date.')
 
     meeting_day = models.PositiveIntegerField(
             choices=DAY_CHOICES, editable=False)
     meeting_frequency = models.PositiveIntegerField(choices=FREQUENCY_CHOICES)
+    recurring_until = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ('meeting_day',)
@@ -94,8 +95,12 @@ class RegularEvent(models.Model):
 
             rrule_kwargs['byweekday'] = day(offset)
 
+        # Last recurring date
+        if self.recurring_until:
+            rrule_kwargs['until'] = self.recurring_until
+
         set = rrule.rruleset()
-        set.rrule(rrule.rrule(freq, interval=interval, dtstart=self.start, until=self.end, **rrule_kwargs))
+        set.rrule(rrule.rrule(freq, interval=interval, dtstart=self.start, **rrule_kwargs))
 
         for i in self.regulareventexclusion_set.all():
             set.exdate(datetime.datetime(i.date.year, i.date.month, i.date.day))

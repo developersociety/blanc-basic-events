@@ -1,16 +1,21 @@
 from django.contrib import admin
-from django.contrib.sites.models import Site
-from .models import RegularEvent, RegularEventExclusion, SpecialEvent
+from .models import Event, RecurringEvent, RecurringEventExclusion
 
 
-class RegularEventExclusionInline(admin.TabularInline):
-    model = RegularEventExclusion
+class RecurringEventInline(admin.TabularInline):
+    model = RecurringEvent
     extra = 1
 
 
-class RegularEventAdmin(admin.ModelAdmin):
-    inlines = [RegularEventExclusionInline]
+class RecurringEventExclusionInline(admin.TabularInline):
+    model = RecurringEventExclusion
+    extra = 1
 
 
-admin.site.register(RegularEvent, RegularEventAdmin)
-admin.site.register(SpecialEvent)
+class EventAdmin(admin.ModelAdmin):
+    inlines = [
+        RecurringEventInline,
+    ]
+
+
+admin.site.register(Event, EventAdmin)

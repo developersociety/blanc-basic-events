@@ -24,7 +24,7 @@ FREQUENCY_CHOICES = (
     (19, 'Monthly - Last'),
 )
 
-class RegularEvent(models.Model):
+class Event(models.Model):
     title = models.CharField(max_length=100, db_index=True)
     slug = models.SlugField(max_length=100, unique=True)
     image = models.ImageField(
@@ -43,22 +43,29 @@ class RegularEvent(models.Model):
     end = models.DateTimeField(
             help_text='End time/date.')
 
-    meeting_day = models.PositiveIntegerField(
-            choices=DAY_CHOICES, editable=False)
-    meeting_frequency = models.PositiveIntegerField(choices=FREQUENCY_CHOICES)
-    recurring_until = models.DateTimeField(null=True, blank=True)
-
     class Meta:
-        ordering = ('meeting_day',)
+        ordering = ('start',)
 
     def __unicode__(self):
         return self.title
 
-    def save(self, *args, **kwargs):
-        self.meeting_day = self.start.weekday()
-        super(RegularEvent, self).save(*args, **kwargs)
 
-    def rruleset(self):
+class RecurringEvent(models.Model):
+    event = models.ForeignKey(Event)
+    meeting_frequency = models.PositiveIntegerField(choices=FREQUENCY_CHOICES)
+    recurring_until = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ('recurring_until',)
+
+    def __unicode__(self):
+        return unicode(self.recurring_until)
+
+    def rrule(self):
+        # Find the day of the week, needed for monthly events
+        weekday = self.event.start.weekday()
+        day = rrule.weekdays[weekday]
+
         # Default = weekly
         interval = 1
         freq = rrule.WEEKLY
@@ -68,48 +75,36 @@ class RegularEvent(models.Model):
             interval = 2
 
         # Monthly (interval = 1)
-        if self.meeting_frequency in ('4', '11', '12', '13', '14', '19'):
+        if self.meeting_frequency in (4, 11, 12, 13, 14, 19):
             freq = rrule.MONTHLY
 
         rrule_kwargs = {}
 
-        # Use this by default if there's a day given
-        day = rrule.weekdays[self.meeting_day]
-        if day:
-            rrule_kwargs['byweekday'] = day
-
         # And other weird things have offsets
-        if self.meeting_frequency in ('11', '12', '13', '14', '19'):
-            if self.meeting_frequency == '11':
+        if self.meeting_frequency in (11, 12, 13, 14, 19):
+            if self.meeting_frequency == 11:
                 offset = 1
-            elif self.meeting_frequency == '12':
+            elif self.meeting_frequency == 12:
                 offset = 2
-            elif self.meeting_frequency == '13':
+            elif self.meeting_frequency == 13:
                 offset = 3
-            elif self.meeting_frequency == '14':
+            elif self.meeting_frequency == 14:
                 offset = 4
-            elif self.meeting_frequency == '15':
+            elif self.meeting_frequency == 15:
                 offset = 5
-            elif self.meeting_frequency == '19':
+            elif self.meeting_frequency == 19:
                 offset = -1
 
             rrule_kwargs['byweekday'] = day(offset)
 
         # Last recurring date
-        if self.recurring_until:
-            rrule_kwargs['until'] = self.recurring_until
+        rrule_kwargs['until'] = self.recurring_until
 
-        set = rrule.rruleset()
-        set.rrule(rrule.rrule(freq, interval=interval, dtstart=self.start, **rrule_kwargs))
-
-        for i in self.regulareventexclusion_set.all():
-            set.exdate(datetime.datetime(i.date.year, i.date.month, i.date.day))
-
-        return set
+        return rrule.rrule(freq, interval=interval, dtstart=self.event.start, **rrule_kwargs)
 
 
-class RegularEventExclusion(models.Model):
-    event = models.ForeignKey(RegularEvent)
+class RecurringEventExclusion(models.Model):
+    event = models.ForeignKey(Event)
     date = models.DateField(db_index=True)
 
     class Meta:
@@ -117,29 +112,3 @@ class RegularEventExclusion(models.Model):
 
     def __unicode__(self):
         return unicode(self.date)
-
-
-class SpecialEvent(models.Model):
-    title = models.CharField(max_length=100, db_index=True)
-    slug = models.SlugField(max_length=100, unique=True)
-    image = models.ImageField(
-           upload_to='events',
-           blank=True, null=True,
-           height_field='image_height', width_field='image_width')
-    image_height = models.PositiveIntegerField(editable=False, null=True)
-    image_width = models.PositiveIntegerField(editable=False, null=True)
-    summary = models.CharField(
-            max_length=100,
-            help_text='A short sentence description of the event.')
-    description = models.TextField(help_text='All of the event details we have.')
-
-    start = models.DateTimeField(
-            help_text='First date this will appear in the calendar.')
-    end = models.DateTimeField(
-            help_text='Last date this will appear in the calendar.')
-
-    class Meta:
-        ordering = ('start',)
-
-    def __unicode__(self):
-        return self.title

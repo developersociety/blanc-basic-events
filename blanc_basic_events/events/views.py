@@ -1,12 +1,14 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.views.generic import ListView
 from .models import Event
 from django.contrib.sites.models import Site, RequestSite
 from django.contrib.syndication.views import add_domain
 from django.conf import settings
+from django.utils import timezone
+from django.template.response import TemplateResponse
 import datetime
 import calendar
-from dateutil.relativedelta import *
+from dateutil.relativedelta import relativedelta
 from dateutil import rrule
 import vobject
 
@@ -62,3 +64,67 @@ def ical_feed(request):
     response['Content-Disposition'] = 'attachment; filename=events.ics'
 
     return response
+
+
+def calendar_index(request):
+    date_now = timezone.now()
+    return calendar_month(request, date_now.year, date_now.month)
+
+
+def calendar_month(request, year, month):
+    year = int(year)
+    month = int(month)
+
+    # Ensure we have a valid month
+    try:
+        view_month = datetime.datetime(year, month, 1)
+        view_month_end = view_month + relativedelta(months=+1, seconds=-1)
+    except ValueError:
+        raise Http404
+
+    # Don't allow infinite years
+    date_now = datetime.datetime.now()
+    if view_month.year > date_now.year + getattr(settings, 'EVENTS_YEAR_MAX', 1) or view_month.year < date_now.year - getattr(settings, 'EVENTS_YEAR_MIN', 1):
+        raise Http404
+
+    # Need matching timezone aware versions
+    current_zone = timezone.get_default_timezone()
+    view_month_tz = timezone.make_aware(view_month, current_zone)
+    view_month_end_tz = timezone.make_aware(view_month_end, current_zone)
+
+    event_list = []
+
+    for event in Event.objects.all().prefetch_related('recurringevent_set'):
+        if event.recurringevent_set.all():
+            # Recurring event
+            for i in event.recurringevent_set.all():
+                event_ruleset = rrule.rruleset()
+                event_ruleset.rrule(i.rrule())
+
+                # Only add dates in the month we're viewing
+                for j in event_ruleset.between(view_month, view_month_end):
+                    event_occurance_tz = timezone.make_aware(j, current_zone)
+                    event_list.append((event_occurance_tz, event))
+        else:
+            # One off event
+            if view_month_end_tz > event.start > view_month_tz:
+                event_list.append((event.start, event))
+
+    # Sort by date
+    event_list.sort(key=lambda x: x[0])
+
+    # Navigation prev/next month
+    previous_month = view_month + relativedelta(months=-1)
+    next_month = view_month + relativedelta(months=1)
+
+    if previous_month.year < date_now.year - getattr(settings, 'EVENTS_YEAR_MIN', 1):
+        previous_month = None
+
+    if next_month.year > date_now.year + getattr(settings, 'EVENTS_YEAR_MAX', 1):
+        next_month = None
+
+    return TemplateResponse(request, 'events/calendar_month.html', {
+        'event_list': event_list,
+        'previous_month': previous_month,
+        'next_month': next_month,
+    })

@@ -97,10 +97,13 @@ class RecurringEvent(models.Model):
 
             rrule_kwargs['byweekday'] = day(offset)
 
-        # Last recurring date
-        rrule_kwargs['until'] = self.recurring_until
+        default_timezone = timezone.get_default_timezone()
 
-        return rrule.rrule(freq, interval=interval, dtstart=self.event.start, **rrule_kwargs)
+        # Last recurring date
+        rrule_kwargs['until'] = timezone.make_naive(self.recurring_until, default_timezone)
+
+        naive_start = timezone.make_naive(self.event.start, default_timezone)
+        return rrule.rrule(freq, interval=interval, dtstart=naive_start, **rrule_kwargs)
 
 
 class RecurringEventExclusion(models.Model):

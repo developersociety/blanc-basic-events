@@ -24,7 +24,20 @@ FREQUENCY_CHOICES = (
     (19, 'Monthly - Last'),
 )
 
+
+class Category(models.Model):
+    title = models.CharField(max_length=100, db_index=True)
+    slug = models.SlugField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ('title',)
+
+    def __unicode__(self):
+        return self.title
+
+
 class Event(models.Model):
+    category = models.ForeignKey(Category)
     title = models.CharField(max_length=100, db_index=True)
     slug = models.SlugField(max_length=100, unique=True)
     image = models.ImageField(

@@ -1,5 +1,12 @@
 from django.contrib import admin
-from .models import Event, RecurringEvent, RecurringEventExclusion
+from .models import Category, Event, RecurringEvent, RecurringEventExclusion
+
+
+class CategoryAdmin(admin.ModelAdmin):
+    search_fields = ('title',)
+    prepopulated_fields = {
+       'slug': ('title',)
+    }
 
 
 class RecurringEventInline(admin.TabularInline):
@@ -19,4 +26,5 @@ class EventAdmin(admin.ModelAdmin):
     ]
 
 
+admin.site.register(Category, CategoryAdmin)
 admin.site.register(Event, EventAdmin)

@@ -32,7 +32,7 @@ def ical_feed(request):
     cal.add('method').value = 'PUBLISH'  # IE/Outlook needs this
 
     # Events
-    for event in Event.objects.all().prefetch_related('recurringevent_set'):
+    for event in Event.objects.all().prefetch_related('recurringevent_set', 'recurringeventexclusion_set'):
         if event.recurringevent_set.all():
             # Recurring event
             for i in event.recurringevent_set.all():
@@ -46,6 +46,11 @@ def ical_feed(request):
 
                 event_ruleset = rrule.rruleset()
                 event_ruleset.rrule(i.rrule())
+
+                # Add in any exclusions
+                for j in event.recurringeventexclusion_set.all():
+                    event_ruleset.exdate(j.date)
+
                 v.rruleset = event_ruleset
         else:
             # One off event
@@ -94,12 +99,16 @@ def calendar_month(request, year, month):
 
     event_list = []
 
-    for event in Event.objects.all().prefetch_related('recurringevent_set'):
+    for event in Event.objects.all().prefetch_related('recurringevent_set', 'recurringeventexclusion_set'):
         if event.recurringevent_set.all():
             # Recurring event
             for i in event.recurringevent_set.all():
                 event_ruleset = rrule.rruleset()
                 event_ruleset.rrule(i.rrule())
+
+                # Add in any exclusions
+                for j in event.recurringeventexclusion_set.all():
+                    event_ruleset.exdate(timezone.make_naive(j.date, current_zone))
 
                 # Only add dates in the month we're viewing
                 for j in event_ruleset.between(view_month, view_month_end):

@@ -9,12 +9,13 @@ class RecurringEventInline(admin.TabularInline):
 
 class RecurringEventExclusionInline(admin.TabularInline):
     model = RecurringEventExclusion
-    extra = 1
+    extra = 0
 
 
 class EventAdmin(admin.ModelAdmin):
     inlines = [
         RecurringEventInline,
+        RecurringEventExclusionInline,
     ]
 
 

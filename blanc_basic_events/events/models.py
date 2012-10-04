@@ -108,7 +108,7 @@ class RecurringEvent(models.Model):
 
 class RecurringEventExclusion(models.Model):
     event = models.ForeignKey(Event)
-    date = models.DateField(db_index=True)
+    date = models.DateTimeField(db_index=True)
 
     class Meta:
         ordering = ('date',)

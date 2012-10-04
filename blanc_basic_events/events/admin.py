@@ -20,6 +20,9 @@ class RecurringEventExclusionInline(admin.TabularInline):
 
 
 class EventAdmin(admin.ModelAdmin):
+    prepopulated_fields = {
+       'slug': ('title',)
+    }
     inlines = [
         RecurringEventInline,
         RecurringEventExclusionInline,

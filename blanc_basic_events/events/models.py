@@ -35,6 +35,12 @@ class Category(models.Model):
     def __unicode__(self):
         return self.title
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('blanc_basic_events:category-event-list', (), {
+            'slug': self.slug,
+        })
+
 
 class Event(models.Model):
     category = models.ForeignKey(Category)
@@ -61,6 +67,12 @@ class Event(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('blanc_basic_events:event-detail', (), {
+            'slug': self.slug,
+        })
 
 
 class RecurringEvent(models.Model):

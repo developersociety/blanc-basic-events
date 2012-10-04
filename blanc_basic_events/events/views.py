@@ -1,16 +1,39 @@
 from django.http import HttpResponse, Http404
-from django.views.generic import ListView
-from .models import Event
+from django.views.generic import ListView, DetailView
+from .models import Category, Event
 from django.contrib.sites.models import Site, RequestSite
 from django.contrib.syndication.views import add_domain
 from django.conf import settings
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 import datetime
 import calendar
 from dateutil.relativedelta import relativedelta
 from dateutil import rrule
 import vobject
+
+
+class EventListView(ListView):
+    model = Event
+
+
+class CategoryEventListView(ListView):
+    model = Event
+    template_name_suffix = '_bycategory_list'
+
+    def get_queryset(self):
+        self.category = get_object_or_404(Category, slug=self.kwargs['slug'])
+        return self.model.objects.filter(category=self.category)
+
+    def get_context_data(self, **kwargs):
+        context = super(CategoryEventListView, self).get_context_data(**kwargs)
+        context['category'] = self.category
+        return context
+
+
+class EventDetailView(DetailView):
+    model = Event
 
 
 # iCal feed

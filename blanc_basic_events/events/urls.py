@@ -3,6 +3,17 @@ import views
 
 
 urlpatterns = patterns('',
+    # Event list/detail
+    url(r'^$',
+        views.EventListView.as_view(),
+        name='event-list'),
+    url(r'^category/(?P<slug>[-\w]+)/$',
+        views.CategoryEventListView.as_view(),
+        name='category-event-list'),
+    url(r'^view/(?P<slug>[-\w]+)/$',
+        views.EventDetailView.as_view(),
+        name='event-detail'),
+
     # iCal feed
     url(r'^events.ics',
         views.ical_feed,

@@ -1,14 +1,9 @@
 from django import template
-from blanc_basic_events.events.models import RegularEvent, SpecialEvent
+from blanc_basic_events.events.models import Event
 
 register = template.Library()
 
 
 @register.assignment_tag
-def get_regular_events():
-    return RegularEvent.objects.all()
-
-
-@register.assignment_tag
-def get_special_events():
-    return SpecialEvent.objects.all()
+def get_events():
+    return Event.objects.all().prefetch_related('recurringevent_set', 'recurringeventexclusion_set')

@@ -17,6 +17,9 @@ import vobject
 class EventListView(ListView):
     model = Event
 
+    def get_queryset(self):
+        return self.model.objects.filter(final_date__gte=timezone.now())
+
 
 class CategoryEventListView(ListView):
     model = Event
@@ -24,7 +27,7 @@ class CategoryEventListView(ListView):
 
     def get_queryset(self):
         self.category = get_object_or_404(Category, slug=self.kwargs['slug'])
-        return self.model.objects.filter(category=self.category)
+        return self.model.objects.filter(final_date__gte=timezone.now(), category=self.category)
 
     def get_context_data(self, **kwargs):
         context = super(CategoryEventListView, self).get_context_data(**kwargs)

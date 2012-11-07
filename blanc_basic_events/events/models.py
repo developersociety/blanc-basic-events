@@ -61,12 +61,45 @@ class Event(models.Model):
             help_text='Start time/date.')
     end = models.DateTimeField(
             help_text='End time/date.')
+    final_date = models.DateTimeField(editable=False, null=True, db_index=True)
 
     class Meta:
         ordering = ('start',)
 
     def __unicode__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        # Set final date to the end, for one off events
+        self.final_date = self.end
+
+        # But find the last recurring event if possible
+        if self.recurringevent_set.all():
+            last_date = None
+
+            # Recurring, find the last date
+            for i in self.recurringevent_set.all():
+                event_ruleset = rrule.rruleset()
+                event_ruleset.rrule(i.rrule())
+
+                # Add in any exclusions
+                for j in self.recurringeventexclusion_set.all():
+                    event_ruleset.exdate(j.date)
+
+                try:
+                    last_recurring_date = event_ruleset[-1]
+
+                    if last_date is None or last_recurring_date > last_date:
+                        last_date = last_recurring_date
+                except IndexError:
+                    pass
+
+                print last_recurring_date
+
+            if last_date:
+                self.final_date = last_date
+
+        super(Event, self).save(*args, **kwargs)
 
     @models.permalink
     def get_absolute_url(self):

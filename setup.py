@@ -7,7 +7,7 @@ except ImportError:
 
 setup(
     name='blanc-basic-events',
-    version='0.2.1',
+    version='0.2.2',
     description='Blanc Basic Events for Django',
     long_description=open('README.rst').read(),
     url='http://www.blanctools.com/',

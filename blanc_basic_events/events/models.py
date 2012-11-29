@@ -71,6 +71,8 @@ class Event(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
+        current_zone = timezone.get_default_timezone()
+
         # Set final date to the end, for one off events
         self.final_date = self.end
 
@@ -85,7 +87,7 @@ class Event(models.Model):
 
                 # Add in any exclusions
                 for j in self.recurringeventexclusion_set.all():
-                    event_ruleset.exdate(j.date)
+                    event_ruleset.exdate(timezone.make_naive(j.date, current_zone))
 
                 try:
                     last_recurring_date = event_ruleset[-1]
@@ -95,10 +97,8 @@ class Event(models.Model):
                 except IndexError:
                     pass
 
-                print last_recurring_date
-
             if last_date:
-                self.final_date = last_date
+                self.final_date = timezone.make_aware(last_date, current_zone)
 
         super(Event, self).save(*args, **kwargs)
 

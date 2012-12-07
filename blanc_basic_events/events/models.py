@@ -134,13 +134,13 @@ class RecurringEvent(models.Model):
             interval = 2
 
         # Monthly (interval = 1)
-        if self.meeting_frequency in (4, 11, 12, 13, 14, 19):
+        if self.meeting_frequency in (4, 11, 12, 13, 14, 15, 19):
             freq = rrule.MONTHLY
 
         rrule_kwargs = {}
 
         # And other weird things have offsets
-        if self.meeting_frequency in (11, 12, 13, 14, 19):
+        if self.meeting_frequency in (11, 12, 13, 14, 15, 19):
             if self.meeting_frequency == 11:
                 offset = 1
             elif self.meeting_frequency == 12:

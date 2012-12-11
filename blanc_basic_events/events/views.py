@@ -158,8 +158,14 @@ def calendar_month(request, year, month):
     if next_month.year > date_now.year + getattr(settings, 'EVENTS_YEAR_MAX', 1):
         next_month = None
 
+    date_now = timezone.now()
+    date_today = date_now.date
+
     return TemplateResponse(request, 'events/calendar_month.html', {
         'event_list': event_list,
+        'month': view_month,
+        'date_now': date_now,
+        'date_today': date_today,
         'previous_month': previous_month,
         'next_month': next_month,
     })

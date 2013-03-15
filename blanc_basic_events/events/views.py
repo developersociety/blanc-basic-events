@@ -8,10 +8,10 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 import datetime
-import calendar
 from dateutil.relativedelta import relativedelta
 from dateutil import rrule
 import vobject
+from blanc_basic_events.events.utils import sorted_event_list
 
 
 class EventListView(ListView):
@@ -118,35 +118,12 @@ def calendar_month(request, year, month):
     if view_month.year > date_now.year + getattr(settings, 'EVENTS_YEAR_MAX', 1) or view_month.year < date_now.year - getattr(settings, 'EVENTS_YEAR_MIN', 1):
         raise Http404
 
-    # Need matching timezone aware versions
+    # Need timezone aware versions
     current_zone = timezone.get_default_timezone()
     view_month_tz = timezone.make_aware(view_month, current_zone)
     view_month_end_tz = timezone.make_aware(view_month_end, current_zone)
 
-    event_list = []
-
-    for event in Event.objects.all().prefetch_related('recurringevent_set', 'recurringeventexclusion_set'):
-        if event.recurringevent_set.all():
-            # Recurring event
-            for i in event.recurringevent_set.all():
-                event_ruleset = rrule.rruleset()
-                event_ruleset.rrule(i.rrule())
-
-                # Add in any exclusions
-                for j in event.recurringeventexclusion_set.all():
-                    event_ruleset.exdate(timezone.make_naive(j.date, current_zone))
-
-                # Only add dates in the month we're viewing
-                for j in event_ruleset.between(view_month, view_month_end):
-                    event_occurance_tz = timezone.make_aware(j, current_zone)
-                    event_list.append((event_occurance_tz, event))
-        else:
-            # One off event
-            if view_month_end_tz > event.start > view_month_tz:
-                event_list.append((event.start, event))
-
-    # Sort by date
-    event_list.sort(key=lambda x: x[0])
+    event_list = sorted_event_list(start_date=view_month_tz, end_date=view_month_end_tz)
 
     # Navigation prev/next month
     previous_month = view_month + relativedelta(months=-1)

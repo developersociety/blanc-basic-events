@@ -14,6 +14,7 @@ DAY_CHOICES = (
 )
 
 FREQUENCY_CHOICES = (
+    (91, 'Daily'),
     (1, 'Weekly'),
     (4, 'Monthly'),
     (11, 'Monthly - First'),
@@ -128,6 +129,10 @@ class RecurringEvent(models.Model):
         # Default = weekly
         interval = 1
         freq = rrule.WEEKLY
+
+        # Daily
+        if self.meeting_frequency == 91:
+            freq = rrule.DAILY
 
         # Fortnightly (weekly, interval = 2)
         if self.meeting_frequency == 2:

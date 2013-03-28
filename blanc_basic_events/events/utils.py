@@ -37,7 +37,7 @@ def sorted_event_list(start_date=None, end_date=None, limit=None):
                     event_list.append((event_occurance_tz, event))
         else:
             # One off event
-            if start_date > event.start > end_date:
+            if end_date > event.start > start_date:
                 event_list.append((event.start, event))
 
     # Sort by date

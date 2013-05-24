@@ -1,10 +1,13 @@
 from django.db.models.signals import post_save, post_delete
-from .models import RecurringEvent, RecurringEventExclusion
+from .models import Event, RecurringEvent, RecurringEventExclusion
 
 
 def update_event(sender, instance, raw=False, **kwargs):
     if not raw:
-        instance.event.save()
+        try:
+            instance.event.save()
+        except Event.DoesNotExist:
+            pass
 
 
 post_save.connect(update_event, sender=RecurringEvent)

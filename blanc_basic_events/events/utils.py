@@ -4,7 +4,7 @@ from dateutil import rrule
 from dateutil.relativedelta import relativedelta
 
 
-def sorted_event_list(start_date=None, end_date=None, limit=None):
+def sorted_event_list(start_date=None, end_date=None, queryset=None, limit=None):
     # Default start date
     if start_date is None:
         start_date = timezone.now()
@@ -20,7 +20,12 @@ def sorted_event_list(start_date=None, end_date=None, limit=None):
 
     event_list = []
 
-    for event in Event.objects.all().prefetch_related('recurringevent_set', 'recurringeventexclusion_set'):
+    if queryset is None:
+        event_queryset = Event.objects.all()
+    else:
+        event_queryset = queryset
+
+    for event in event_queryset.prefetch_related('recurringevent_set', 'recurringeventexclusion_set'):
         if event.recurringevent_set.all():
             # Recurring event
             for i in event.recurringevent_set.all():

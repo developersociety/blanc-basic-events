@@ -1,8 +1,5 @@
 #!/usr/bin/env python
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup, find_packages
 
 
 setup(
@@ -10,23 +7,23 @@ setup(
     version='0.2.7',
     description='Blanc Basic Events for Django',
     long_description=open('README.rst').read(),
-    url='http://www.blanctools.com/',
+    url='https://github.com/blancltd/blanc-basic-events',
     maintainer='Alex Tomkins',
-    maintainer_email='alex@hawkz.com',
+    maintainer_email='alex@blanc.ltd.uk',
     platforms=['any'],
     install_requires=[
         'icalendar>=3.6',
     ],
-    packages=[
-        'blanc_basic_events',
-        'blanc_basic_events.templatetags',
-    ],
+    packages=find_packages(),
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
     ],
-    license='BSD-2',
+    license='BSD',
 )

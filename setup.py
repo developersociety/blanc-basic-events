@@ -15,12 +15,11 @@ setup(
     maintainer_email='alex@hawkz.com',
     platforms=['any'],
     install_requires=[
-        'vobject>=0.8.1c',
+        'icalendar>=3.6',
     ],
     packages=[
         'blanc_basic_events',
-        'blanc_basic_events.events',
-        'blanc_basic_events.events.templatetags',
+        'blanc_basic_events.templatetags',
     ],
     classifiers=[
         'Environment :: Web Environment',

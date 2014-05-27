@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.views.generic import ListView, DetailView
 from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
 from icalendar import Calendar, Event
 import datetime
 from . import get_special_events_model, get_recurring_events_model
@@ -42,9 +43,11 @@ def ical_feed(request):
     cal.add('x-wr-calname', getattr(settings, 'EVENTS_CALENDAR_NAME', 'Events'))
     cal.add('x-wr-caldesc', getattr(settings, 'EVENTS_CALENDAR_DESCRIPTION', 'Events Calendar'))
 
+    domain = get_current_site(request).domain
+
     # Events
     for i in get_special_events_model().objects.filter(published=True, final_date__gte=datetime.date.today()):
-        event = Event(uid=i.id, summary=i.title)
+        event = Event(uid='%d@%s' % (i.id, domain), summary=i.title)
         event.add('dtstart', i.start)  # Ensure the datetime gets encoded
         cal.add_component(event)
 

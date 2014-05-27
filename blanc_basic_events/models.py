@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from django.core.exceptions import ValidationError
 
 
 @python_2_unicode_compatible
@@ -35,6 +36,10 @@ class AbstractSpecialEvent(models.Model):
         return ('blanc_basic_events:specialevent-detail', (), {
             'slug': self.slug,
         })
+
+    def clean(self):
+        if self.start > self.end:
+            raise ValidationError('Start date must be earlier than end date.')
 
 
 class SpecialEvent(AbstractSpecialEvent):

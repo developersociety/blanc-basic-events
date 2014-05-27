@@ -35,7 +35,7 @@ class AbstractSpecialEvent(models.Model):
         if self.final_date < self.start_date:
             self.final_date = self.start_date
 
-        super(SpecialEvent, self).save(*args, **kwargs)
+        super(AbstractSpecialEvent, self).save(*args, **kwargs)
 
     @models.permalink
     def get_absolute_url(self):

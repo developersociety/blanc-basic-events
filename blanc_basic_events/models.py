@@ -10,10 +10,10 @@ class AbstractSpecialEvent(models.Model):
     summary = models.CharField(max_length=100,
                                help_text='A short sentence description of the event')
     description = models.TextField(help_text='All of the event details we have')
-    start = models.DateTimeField(help_text='Start time/date.')
+    start = models.DateTimeField(help_text='Start time/date.', db_index=True)
     start_date = models.DateField(editable=False, db_index=True)
-    final_date = models.DateField(blank=True, db_index=True,
-                                  help_text='Last date this event appears on the list page')
+    end = models.DateTimeField(help_text='End time/date.')
+    end_date = models.DateField(editable=False, db_index=True)
     published = models.BooleanField(default=True, db_index=True)
 
     class Meta:
@@ -26,14 +26,7 @@ class AbstractSpecialEvent(models.Model):
     def save(self, *args, **kwargs):
         # Used for easy queryset filtering
         self.start_date = self.start.date()
-
-        # Set a default final date if one isn't given
-        if not self.final_date:
-            self.final_date = self.start.date()
-
-        # If someone forgets to fix the final date after changing the event
-        if self.final_date < self.start_date:
-            self.final_date = self.start_date
+        self.end_date = self.end.date()
 
         super(AbstractSpecialEvent, self).save(*args, **kwargs)
 

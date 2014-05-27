@@ -14,12 +14,12 @@ class EventsHomeView(ListView):
     def special_events_this_week(self):
         today = datetime.date.today()
         next_week = today + datetime.timedelta(days=7)
-        return get_special_events_model().objects.filter(final_date__gte=today,
+        return get_special_events_model().objects.filter(end_date__gte=today,
                                                          start_date__lte=next_week,
                                                          published=True)
 
     def upcoming_special_events(self):
-        return get_special_events_model().objects.filter(final_date__gte=datetime.date.today(),
+        return get_special_events_model().objects.filter(end_date__gte=datetime.date.today(),
                                                          published=True)
 
 
@@ -27,7 +27,7 @@ class SpecialEventListView(ListView):
     model = get_special_events_model()
 
     def get_queryset(self):
-        return self.model.objects.filter(published=True, final_date__gte=datetime.date.today())
+        return self.model.objects.filter(published=True, end_date__gte=datetime.date.today())
 
 
 class SpecialEventDetailView(DetailView):
@@ -46,9 +46,10 @@ def ical_feed(request):
     domain = get_current_site(request).domain
 
     # Events
-    for i in get_special_events_model().objects.filter(published=True, final_date__gte=datetime.date.today()):
+    for i in get_special_events_model().objects.filter(published=True, end_date__gte=datetime.date.today()):
         event = Event(uid='%d@%s' % (i.id, domain), summary=i.title)
         event.add('dtstart', i.start)  # Ensure the datetime gets encoded
+        event.add('dtend', i.end)
         cal.add_component(event)
 
     response = HttpResponse(cal.to_ical(), content_type='text/calendar')

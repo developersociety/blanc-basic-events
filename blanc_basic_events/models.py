@@ -1,13 +1,14 @@
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.core.exceptions import ValidationError
+from blanc_basic_assets.fields import AssetForeignKey
 
 
 @python_2_unicode_compatible
 class AbstractSpecialEvent(models.Model):
     title = models.CharField(max_length=100, db_index=True)
     slug = models.SlugField(max_length=100, unique=True)
-    image = models.ForeignKey('assets.Image', null=True, blank=True)
+    image = AssetForeignKey('assets.Image', null=True, blank=True)
     summary = models.CharField(max_length=100,
                                help_text='A short sentence description of the event')
     description = models.TextField(help_text='All of the event details we have')
@@ -60,7 +61,7 @@ class AbstractRecurringEvent(models.Model):
     )
 
     title = models.CharField(max_length=100, db_index=True)
-    image = models.ForeignKey('assets.Image', null=True, blank=True)
+    image = AssetForeignKey('assets.Image', null=True, blank=True)
     description = models.TextField()
     day_of_the_week = models.PositiveSmallIntegerField(choices=DAY_CHOICES, db_index=True)
     frequency = models.CharField(default='Weekly', max_length=200)

@@ -1,7 +1,11 @@
 from django.db import models
+from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
 from django.core.exceptions import ValidationError
 from blanc_basic_assets.fields import AssetForeignKey
+
+
+EVENTS_START_SUNDAY = getattr(settings, 'EVENTS_START_SUNDAY', True)
 
 
 @python_2_unicode_compatible
@@ -50,15 +54,16 @@ class SpecialEvent(AbstractSpecialEvent):
 
 @python_2_unicode_compatible
 class AbstractRecurringEvent(models.Model):
-    DAY_CHOICES = (
-        (7, 'Sunday'),  # We intentionally start on Sunday, but with isoweekday for numbering
+    START_WEEK = ((0, 'Sunday'),) if EVENTS_START_SUNDAY else ()
+    END_WEEK = ((7, 'Sunday'),) if not EVENTS_START_SUNDAY else ()
+    DAY_CHOICES = START_WEEK + (
         (1, 'Monday'),
         (2, 'Tuesday'),
         (3, 'Wednesday'),
         (4, 'Thursday'),
         (5, 'Friday'),
         (6, 'Saturday'),
-    )
+    ) + END_WEEK
 
     title = models.CharField(max_length=100, db_index=True)
     image = AssetForeignKey('assets.Image', null=True, blank=True)

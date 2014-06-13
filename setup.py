@@ -12,6 +12,7 @@ setup(
     maintainer_email='alex@blanc.ltd.uk',
     platforms=['any'],
     install_requires=[
+        'blanc-basic-assets>=0.3',
         'icalendar>=3.6',
     ],
     packages=find_packages(),

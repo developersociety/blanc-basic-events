@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='blanc-basic-events',
-    version='0.3',
+    version='0.3.1',
     description='Blanc Basic Events for Django',
     long_description=open('README.rst').read(),
     url='https://github.com/blancltd/blanc-basic-events',

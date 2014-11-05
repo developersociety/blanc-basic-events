@@ -15,5 +15,5 @@ class SpecialEventAdmin(admin.ModelAdmin):
 
 @admin.register(RecurringEvent)
 class RecurringEventAdmin(admin.ModelAdmin):
-    list_display = ('title', 'day_of_the_week', 'published')
+    list_display = ('title', 'day_of_the_week', 'time', 'published')
     list_filter = ('day_of_the_week', 'published')

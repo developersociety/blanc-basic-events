@@ -69,11 +69,12 @@ class AbstractRecurringEvent(models.Model):
     image = AssetForeignKey('assets.Image', null=True, blank=True)
     description = models.TextField()
     day_of_the_week = models.PositiveSmallIntegerField(choices=DAY_CHOICES, db_index=True)
-    frequency = models.CharField(default='Weekly', max_length=200)
+    time = models.TimeField(db_index=True)
+    frequency = models.CharField(max_length=200, blank=True)
     published = models.BooleanField(default=True, db_index=True)
 
     class Meta:
-        ordering = ('day_of_the_week', 'title')
+        ordering = ('day_of_the_week', 'time')
         abstract = True
 
     def __str__(self):

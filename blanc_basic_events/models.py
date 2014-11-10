@@ -66,7 +66,6 @@ class AbstractRecurringEvent(models.Model):
     ) + END_WEEK
 
     title = models.CharField(max_length=100, db_index=True)
-    image = AssetForeignKey('assets.Image', null=True, blank=True)
     description = models.TextField()
     day_of_the_week = models.PositiveSmallIntegerField(choices=DAY_CHOICES, db_index=True)
     time = models.TimeField(db_index=True)

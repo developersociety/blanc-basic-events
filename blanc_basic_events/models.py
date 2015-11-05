@@ -1,7 +1,8 @@
-from django.db import models
 from django.conf import settings
-from django.utils.encoding import python_2_unicode_compatible
 from django.core.exceptions import ValidationError
+from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
+
 from blanc_basic_assets.fields import AssetForeignKey
 
 
@@ -13,8 +14,8 @@ class AbstractSpecialEvent(models.Model):
     title = models.CharField(max_length=100, db_index=True)
     slug = models.SlugField(max_length=100, unique=True)
     image = AssetForeignKey('assets.Image', null=True, blank=True)
-    summary = models.CharField(max_length=100,
-                               help_text='A short sentence description of the event')
+    summary = models.CharField(
+        max_length=100, help_text='A short sentence description of the event')
     description = models.TextField(help_text='All of the event details we have')
     start = models.DateTimeField(help_text='Start time/date.', db_index=True)
     start_date = models.DateField(editable=False, db_index=True)

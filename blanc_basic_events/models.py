@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -38,9 +39,8 @@ class SpecialEvent(models.Model):
 
         super(SpecialEvent, self).save(*args, **kwargs)
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('blanc_basic_events:specialevent-detail', (), {
+        return reverse('blanc_basic_events:specialevent-detail', kwargs={
             'slug': self.slug,
         })
 

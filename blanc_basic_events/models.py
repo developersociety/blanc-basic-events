@@ -49,16 +49,16 @@ class SpecialEvent(models.Model):
 
 @python_2_unicode_compatible
 class RecurringEvent(models.Model):
-    START_WEEK = ((0, 'Sunday'),) if EVENTS_START_SUNDAY else ()
-    END_WEEK = ((7, 'Sunday'),) if not EVENTS_START_SUNDAY else ()
-    DAY_CHOICES = START_WEEK + (
+    DAY_CHOICES = (
+        (0, 'Sunday'),
         (1, 'Monday'),
         (2, 'Tuesday'),
         (3, 'Wednesday'),
         (4, 'Thursday'),
         (5, 'Friday'),
         (6, 'Saturday'),
-    ) + END_WEEK
+        (7, 'Sunday'),
+    )
 
     title = models.CharField(max_length=100, db_index=True)
     description = models.TextField()

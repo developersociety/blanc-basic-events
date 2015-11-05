@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from .forms import recurringevent_admin_form
 from .models import RecurringEvent, SpecialEvent
 
 
@@ -18,3 +19,4 @@ class SpecialEventAdmin(admin.ModelAdmin):
 class RecurringEventAdmin(admin.ModelAdmin):
     list_display = ('title', 'day_of_the_week', 'time', 'published')
     list_filter = ('day_of_the_week', 'published')
+    form = recurringevent_admin_form()

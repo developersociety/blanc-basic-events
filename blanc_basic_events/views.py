@@ -6,33 +6,33 @@ from django.http import HttpResponse
 from django.views.generic import DetailView, ListView
 from icalendar import Calendar, Event
 
-from . import get_recurring_events_model, get_special_events_model
+from .models import RecurringEvent, SpecialEvent
 
 
 class EventsHomeView(ListView):
-    queryset = get_recurring_events_model().objects.filter(published=True)
+    queryset = RecurringEvent.objects.filter(published=True)
     allow_empty = True
 
     def special_events_this_week(self):
         today = datetime.date.today()
         next_week = today + datetime.timedelta(days=7)
-        return get_special_events_model().objects.filter(
+        return SpecialEvent.objects.filter(
             end_date__gte=today, start_date__lte=next_week, published=True)
 
     def upcoming_special_events(self):
-        return get_special_events_model().objects.filter(
+        return SpecialEvent.objects.filter(
             end_date__gte=datetime.date.today(), published=True)
 
 
 class SpecialEventListView(ListView):
-    model = get_special_events_model()
+    model = SpecialEvent
 
     def get_queryset(self):
         return self.model.objects.filter(published=True, end_date__gte=datetime.date.today())
 
 
 class SpecialEventDetailView(DetailView):
-    queryset = get_special_events_model().objects.filter(published=True)
+    queryset = SpecialEvent.objects.filter(published=True)
 
 
 # iCal feed
@@ -48,7 +48,7 @@ def ical_feed(request):
 
     # Events
     today = datetime.date.today()
-    for i in get_special_events_model().objects.filter(published=True, end_date__gte=today):
+    for i in SpecialEvent.objects.filter(published=True, end_date__gte=today):
         event = Event(uid='%d@%s' % (i.id, domain), summary=i.title)
         event.add('dtstart', i.start)  # Ensure the datetime gets encoded
         event.add('dtend', i.end)

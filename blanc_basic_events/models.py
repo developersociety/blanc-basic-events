@@ -10,7 +10,7 @@ EVENTS_START_SUNDAY = getattr(settings, 'EVENTS_START_SUNDAY', True)
 
 
 @python_2_unicode_compatible
-class AbstractSpecialEvent(models.Model):
+class SpecialEvent(models.Model):
     title = models.CharField(max_length=100, db_index=True)
     slug = models.SlugField(max_length=100, unique=True)
     image = AssetForeignKey('assets.Image', null=True, blank=True)
@@ -25,7 +25,6 @@ class AbstractSpecialEvent(models.Model):
 
     class Meta:
         ordering = ('start',)
-        abstract = True
 
     def __str__(self):
         return self.title
@@ -35,7 +34,7 @@ class AbstractSpecialEvent(models.Model):
         self.start_date = self.start.date()
         self.end_date = self.end.date()
 
-        super(AbstractSpecialEvent, self).save(*args, **kwargs)
+        super(SpecialEvent, self).save(*args, **kwargs)
 
     @models.permalink
     def get_absolute_url(self):
@@ -48,13 +47,8 @@ class AbstractSpecialEvent(models.Model):
             raise ValidationError('Start date must be earlier than end date.')
 
 
-class SpecialEvent(AbstractSpecialEvent):
-    class Meta(AbstractSpecialEvent.Meta):
-        swappable = 'EVENTS_SPECIAL_MODEL'
-
-
 @python_2_unicode_compatible
-class AbstractRecurringEvent(models.Model):
+class RecurringEvent(models.Model):
     START_WEEK = ((0, 'Sunday'),) if EVENTS_START_SUNDAY else ()
     END_WEEK = ((7, 'Sunday'),) if not EVENTS_START_SUNDAY else ()
     DAY_CHOICES = START_WEEK + (
@@ -75,12 +69,6 @@ class AbstractRecurringEvent(models.Model):
 
     class Meta:
         ordering = ('day_of_the_week', 'time')
-        abstract = True
 
     def __str__(self):
         return self.title
-
-
-class RecurringEvent(AbstractRecurringEvent):
-    class Meta(AbstractRecurringEvent.Meta):
-        swappable = 'EVENTS_RECURRING_MODEL'

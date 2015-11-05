@@ -1,9 +1,9 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from . import views
 
 
-urlpatterns = patterns('',
+urlpatterns = [
     # Event list/detail
     url(r'^$',
         views.EventsHomeView.as_view(),
@@ -19,4 +19,4 @@ urlpatterns = patterns('',
     url(r'^events.ics$',
         views.ical_feed,
         name='feed'),
-)
+]

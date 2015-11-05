@@ -44,12 +44,12 @@ Edit your Django project's settings module, ensure that the required
 dependencies are installed and configured, then add ``blanc_basic_events`` to
 ``INSTALLED_APPS``::
 
-    INSTALLED_APPS = (
+    INSTALLED_APPS = [
         ...
         'blanc_basic_assets',
         ...
         'blanc_basic_events',
-    )
+    ]
 
 Also in the settings file you should edit the title for iCal feeds::
 
@@ -59,11 +59,11 @@ Once this is done, run ``python manage.py migrate`` to update your database.
 
 Edit your Django project's URL config file, and add the URL pattern for events::
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         ...
 
         # Events
         url(r'^events/', include('blanc_basic_events.urls', namespace='blanc_basic_events')),
-    )
+    ]
 
 Then your project will be ready to use the events package.

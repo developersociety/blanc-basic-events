@@ -45,7 +45,7 @@ class SpecialEvent(models.Model):
         })
 
     def clean(self):
-        if self.start > self.end:
+        if self.start and self.end and self.start > self.end:
             raise ValidationError('Start date must be earlier than end date.')
 
 

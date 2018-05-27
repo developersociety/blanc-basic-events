@@ -7,7 +7,7 @@ setup(
     version='0.3.4',
     description='Blanc Basic Events for Django',
     long_description=open('README.rst').read(),
-    url='https://github.com/blancltd/blanc-basic-events',
+    url='https://github.com/developersociety/blanc-basic-events',
     maintainer='Blanc Ltd',
     maintainer_email='studio@blanc.ltd.uk',
     platforms=['any'],

@@ -9,7 +9,7 @@ Before installing blanc-basic-events, you'll need a copy of Django__ 1.7,
 and blanc-basic-assets__ installed.
 
 .. __: http://www.djangoproject.com/
-.. __: https://github.com/blancltd/blanc-basic-assets
+.. __: https://github.com/developersociety/blanc-basic-assets
 
 
 Installing blanc-basic-events
